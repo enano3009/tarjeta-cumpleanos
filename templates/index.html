@@ -145,6 +145,37 @@
         .highlight { color: #107c41; }
         p { font-size: 1.15rem; line-height: 1.6; color: #cbd5e1; margin-bottom: 25px; }
 
+        /* ESTILOS DEL CONTADOR REGRESIVO */
+        .countdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+            background: rgba(11, 14, 20, 0.7);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(16, 124, 65, 0.3);
+        }
+        .countdown-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .countdown-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #107c41;
+            text-shadow: 0 0 10px rgba(16, 124, 65, 0.5);
+        }
+        .countdown-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
         .date-picker-container {
             display: flex;
             justify-content: center;
@@ -203,7 +234,6 @@
 </head>
 <body>
 
-    <!-- REPRODUCTOR DE AUDIO APUNTANDO A LA CARPETA STATIC DE FLASK -->
     <audio id="bgMusic" src="{{ url_for('static', filename='musica.mp3') }}" loop preload="auto"></audio>
 
     <div id="start-overlay">
@@ -227,6 +257,27 @@
         <div class="step active" id="step-1">
             <div class="tag">LEVEL UP 🎂</div>
             <h1>¡Se acerca mi <span class="highlight">Cumpleaños!</span></h1>
+            
+            <!-- CONTADOR REGRESIVO -->
+            <div class="countdown-container">
+                <div class="countdown-box">
+                    <span class="countdown-value" id="cd-months">0</span>
+                    <span class="countdown-label">Meses</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-value" id="cd-days">0</span>
+                    <span class="countdown-label">Días</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-value" id="cd-hours">00</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-value" id="cd-seconds">00</span>
+                    <span class="countdown-label">Seg</span>
+                </div>
+            </div>
+
             <p>He preparado algo especial para esta fecha tan importante y quiero compartirlo contigo.</p>
             <button class="btn btn-next" onclick="goToStep(2)">Continuar ➔</button>
         </div>
@@ -316,9 +367,7 @@
             audio.play().then(() => {
                 isPlaying = true;
                 document.getElementById('musicToggle').innerHTML = "🔊 Música: ON";
-            }).catch(err => {
-                console.log("Error de reproducción:", err);
-            });
+            }).catch(err => console.log("Error de audio:", err));
             document.getElementById('start-overlay').style.display = 'none';
         }
 
@@ -356,6 +405,42 @@
                 goToStep('step-3b');
             }
         }
+
+        // LÓGICA DEL CONTEO REGRESIVO
+        function updateCountdown() {
+            const now = new Date();
+            let year = now.getFullYear();
+            let targetDate = new Date(year, 8, 30, 0, 0, 0); // 30 de Septiembre (Mes 8 en JS)
+
+            if (now > targetDate) {
+                targetDate = new Date(year + 1, 8, 30, 0, 0, 0);
+            }
+
+            let diffMonths = (targetDate.getFullYear() - now.getFullYear()) * 12 + (targetDate.getMonth() - now.getMonth());
+            let tempDate = new Date(now);
+            tempDate.setMonth(tempDate.getMonth() + diffMonths);
+
+            if (tempDate > targetDate) {
+                diffMonths--;
+                tempDate = new Date(now);
+                tempDate.setMonth(tempDate.getMonth() + diffMonths);
+            }
+
+            const diffMs = targetDate - tempDate;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            const totalMsLeft = targetDate - now;
+            const diffHours = Math.floor((totalMsLeft / (1000 * 60 * 60)) % 24);
+            const diffSeconds = Math.floor((totalMsLeft / 1000) % 60);
+
+            document.getElementById('cd-months').innerText = diffMonths;
+            document.getElementById('cd-days').innerText = diffDays;
+            document.getElementById('cd-hours').innerText = String(diffHours).padStart(2, '0');
+            document.getElementById('cd-seconds').innerText = String(diffSeconds).padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
     </script>
 </body>
 </html>
