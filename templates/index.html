@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edgar's Birthday Quest 🎮</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0b0e14;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(16, 124, 65, 0.25) 0%, transparent 75%),
+                linear-gradient(to bottom, rgba(11, 14, 20, 0.8), #07090d);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b0e14;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #start-overlay h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        #start-overlay p {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        .btn-start {
+            background: #107c41;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            padding: 18px 36px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(16, 124, 65, 0.6);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .btn-start:hover {
+            background: #13964f;
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(16, 124, 65, 0.9);
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: rgba(16, 124, 65, 0.2);
+            border: 1px solid #107c41;
+            color: #107c41;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .card-container {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            background: rgba(18, 24, 38, 0.85);
+            border: 2px solid rgba(16, 124, 65, 0.4);
+            border-radius: 24px;
+            padding: 35px 25px;
+            box-shadow: 0 0 30px rgba(16, 124, 65, 0.25), 0 20px 50px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .step-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.4s ease;
+        }
+        .dot.active {
+            background: #107c41;
+            box-shadow: 0 0 12px #107c41;
+            transform: scale(1.3);
+        }
+
+        .step {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            text-align: center;
+        }
+        .step.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(16, 124, 65, 0.2);
+            color: #107c41;
+            border: 1px solid #107c41;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        h1, h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .highlight { color: #107c41; }
+        p { font-size: 1.15rem; line-height: 1.6; color: #cbd5e1; margin-bottom: 25px; }
+
+        .date-picker-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .date-select {
+            background: #0b0e14;
+            color: #38bdf8;
+            border: 1px solid rgba(16, 124, 65, 0.6);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .gta-box {
+            background: linear-gradient(135deg, rgba(255, 0, 128, 0.1) 0%, rgba(16, 124, 65, 0.2) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .gta-title { color: #ff4d8d; font-family: 'Orbitron', sans-serif; font-size: 1.3rem; margin-bottom: 8px; }
+
+        .bank-info {
+            background: rgba(10, 14, 23, 0.8);
+            border: 1px dashed rgba(16, 124, 65, 0.5);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .bank-info strong { color: #107c41; }
+        .bank-info code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #38bdf8; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            display: inline-block;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+        .btn-next { background: #107c41; color: #ffffff; }
+        .btn-paypal { background-color: #0070ba; color: #ffffff; }
+        .btn-whatsapp { background-color: #25d366; color: #ffffff; }
+        .btn-back { background: transparent; color: #64748b; font-size: 0.8rem; margin-top: 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- REPRODUCTOR DE AUDIO APUNTANDO A LA CARPETA STATIC DE FLASK -->
+    <audio id="bgMusic" src="{{ url_for('static', filename='musica.mp3') }}" loop preload="auto"></audio>
+
+    <div id="start-overlay">
+        <h1>EDGAR'S BIRTHDAY QUEST</h1>
+        <p>Presiona para iniciar la experiencia</p>
+        <button class="btn-start" onclick="startExperience()">▶ INICIAR</button>
+    </div>
+
+    <button class="music-control" id="musicToggle" onclick="toggleMusic()">🔊 Música: ON</button>
+
+    <div class="card-container">
+        <div class="step-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <!-- PASO 1 -->
+        <div class="step active" id="step-1">
+            <div class="tag">LEVEL UP 🎂</div>
+            <h1>¡Se acerca mi <span class="highlight">Cumpleaños!</span></h1>
+            <p>He preparado algo especial para esta fecha tan importante y quiero compartirlo contigo.</p>
+            <button class="btn btn-next" onclick="goToStep(2)">Continuar ➔</button>
+        </div>
+
+        <!-- PASO 2 -->
+        <div class="step" id="step-2">
+            <div class="tag">TRIVIA TIME 🧠</div>
+            <h2>¿Sabes qué día es <span class="highlight">mi cumpleaños?</span></h2>
+            <p>Selecciona el día y el mes a continuación:</p>
+            <div class="date-picker-container">
+                <select id="daySelect" class="date-select">
+                    <script>for(let i=1; i<=31; i++) document.write(`<option value="${i}">${i}</option>`);</script>
+                </select>
+                <select id="monthSelect" class="date-select">
+                    <option value="1">Enero</option><option value="2">Febrero</option>
+                    <option value="3">Marzo</option><option value="4">Abril</option>
+                    <option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option>
+                    <option value="9">Septiembre</option><option value="10">Octubre</option>
+                    <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+            </div>
+            <button class="btn btn-next" onclick="checkBirthday()">Comprobar fecha ➔</button>
+            <br><button class="btn-back" onclick="goToStep(1)">⬅ Volver atrás</button>
+        </div>
+
+        <!-- PASO 3A -->
+        <div class="step" id="step-3a">
+            <div class="tag">PERFECT MATCH! 🎉</div>
+            <h1>¡Exacto! <span class="highlight">30 de Septiembre</span></h1>
+            <p>¡Muchas gracias por acordarte de mi fecha especial!</p>
+            <button class="btn btn-next" onclick="goToStep(4)">Continuar ➔</button>
+        </div>
+
+        <!-- PASO 3B -->
+        <div class="step" id="step-3b">
+            <div class="tag">DONT WORRY! 😉</div>
+            <h1>¡No te preocupes!</h1>
+            <p>Coño, pensé que te lo sabías, pero nada. Mi cumpleaños es el <strong class="highlight">30 de Septiembre</strong>.</p>
+            <button class="btn btn-next" onclick="goToStep(4)">Continuar ➔</button>
+        </div>
+
+        <!-- PASO 4 -->
+        <div class="step" id="step-4">
+            <div class="tag">TARGET REVEALED 🎮</div>
+            <h1>Mi Meta: <span class="highlight">Xbox Series X</span></h1>
+            <p>Este año decidí unificar todos mis regalos en una sola gran meta: conseguir la consola de nueva generación.</p>
+            <button class="btn btn-next" onclick="goToStep(5)">¿Por qué esta meta? ➔</button>
+        </div>
+
+        <!-- PASO 5 -->
+        <div class="step" id="step-5">
+            <div class="tag">THE REASON 🌴🔥</div>
+            <h2>El momento histórico:</h2>
+            <div class="gta-box">
+                <div class="gta-title">GRAND THEFT AUTO VI</div>
+                <p style="margin-bottom:0; color:#f1f5f9;">"Casi va a salir el GTA VI y quiero estar listo para jugarlo desde el <strong>Día 1</strong>."</p>
+            </div>
+            <p>Cualquier aporte me acerca un paso más a conseguirla.</p>
+            <button class="btn btn-next" onclick="goToStep(6)">Ver opciones de apoyo ➔</button>
+            <br><button class="btn-back" onclick="goToStep(4)">⬅ Volver atrás</button>
+        </div>
+
+        <!-- PASO 6 -->
+        <div class="step" id="step-6">
+            <div class="tag">SUPPORT THE QUEST 💳</div>
+            <h2>Opciones de <span class="highlight">Aporte</span></h2>
+            <div class="bank-info">
+                <p><strong>🏦 Transferencia Local (RD$):</strong></p>
+                <p>• Banco Popular (Cuenta Corriente)</p>
+                <p>• No. Cuenta: <code>852749332</code></p>
+                <p>• Titular: Edgar Manuel José</p>
+            </div>
+            <div class="btn-group">
+                <a href="/pagar-paypal" class="btn btn-paypal" target="_blank">💳 Apoyar con PayPal / Tarjeta</a>
+                <a href="/whatsapp" class="btn btn-whatsapp" target="_blank">📱 Notificar por WhatsApp</a>
+            </div>
+            <button class="btn-back" onclick="goToStep(5)" style="margin-top: 15px;">⬅ Volver a leer la historia</button>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('bgMusic');
+        let isPlaying = false;
+
+        function startExperience() {
+            audio.play().then(() => {
+                isPlaying = true;
+                document.getElementById('musicToggle').innerHTML = "🔊 Música: ON";
+            }).catch(err => {
+                console.log("Error de reproducción:", err);
+            });
+            document.getElementById('start-overlay').style.display = 'none';
+        }
+
+        function toggleMusic() {
+            const btn = document.getElementById('musicToggle');
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                btn.innerHTML = "🔇 Música: OFF";
+            } else {
+                audio.play();
+                isPlaying = true;
+                btn.innerHTML = "🔊 Música: ON";
+            }
+        }
+
+        function goToStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            const dotIndex = typeof stepId === 'number' ? stepId : 3;
+            document.querySelectorAll('.dot').forEach((dot, idx) => {
+                dot.classList.toggle('active', idx < dotIndex);
+            });
+            setTimeout(() => {
+                const target = typeof stepId === 'string' ? document.getElementById(stepId) : document.getElementById(`step-${stepId}`);
+                if (target) target.classList.add('active');
+            }, 100);
+        }
+
+        function checkBirthday() {
+            const day = document.getElementById('daySelect').value;
+            const month = document.getElementById('monthSelect').value;
+            if (day === "30" && month === "9") {
+                goToStep('step-3a');
+            } else {
+                goToStep('step-3b');
+            }
+        }
+    </script>
+</body>
+</html>
