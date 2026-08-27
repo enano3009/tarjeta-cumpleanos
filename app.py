@@ -1,27 +1,28 @@
-from flask import Flask, render_template, redirect
-import urllib.parse
+import os
+from flask import Flask, render_template, redirect, request
 
 app = Flask(__name__)
 
-# --- CONFIGURACIÓN DE DATOS ---
-PAYPAL_EMAIL = "edgarj300901@gmail.com"
-WHATSAPP_PHONE = "18296396788"
+# Configuración de PayPal y WhatsApp
+PAYPAL_ME_URL = "https://paypal.me/edgarjose3"  # Cambia esto si tienes otra URL de PayPal
+WHATSAPP_NUMBER = "18296335160"  # Número de WhatsApp configurado para notificaciones
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/pagar-paypal')
 def pagar_paypal():
-    paypal_url = f"https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business={urllib.parse.quote(PAYPAL_EMAIL)}&currency_code=USD&item_name=Aporte+Xbox+Series+X+-+Cumpleanos+Edgar"
-    return redirect(paypal_url)
+    # Redirige directamente al perfil o checkout de PayPal
+    return redirect(PAYPAL_ME_URL)
 
 @app.route('/whatsapp')
-def enviar_whatsapp():
-    mensaje = "¡Hola Edgar! Te escribo para enviarte el comprobante de mi aporte para tu Xbox Series X y que estés listo para el GTA VI. 🎮🔥"
-    mensaje_codificado = urllib.parse.quote(mensaje)
-    whatsapp_url = f"https://api.whatsapp.com/send?phone={WHATSAPP_PHONE}&text={mensaje_codificado}"
+def whatsapp():
+    # Mensaje predeterminado para el chat de WhatsApp
+    mensaje = "¡Hola Edgar! Estuve viendo tu página de cumpleaños y quiero apoyarte con tu meta del Xbox Series X 🎮🎂."
+    whatsapp_url = f"https://api.whatsapp.com/send?phone={WHATSAPP_NUMBER}&text={mensaje.replace(' ', '%20')}"
     return redirect(whatsapp_url)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
