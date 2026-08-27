@@ -145,14 +145,14 @@
         .highlight { color: #107c41; }
         p { font-size: 1.15rem; line-height: 1.6; color: #cbd5e1; margin-bottom: 25px; }
 
-        /* ESTILOS DEL CONTADOR REGRESIVO */
+        /* ESTILOS DEL CONTADOR REGRESIVO (5 COLUMNAS) */
         .countdown-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
             margin: 20px 0;
             background: rgba(11, 14, 20, 0.7);
-            padding: 15px;
+            padding: 12px 6px;
             border-radius: 16px;
             border: 1px solid rgba(16, 124, 65, 0.3);
         }
@@ -163,16 +163,16 @@
         }
         .countdown-value {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #107c41;
             text-shadow: 0 0 10px rgba(16, 124, 65, 0.5);
         }
         .countdown-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin-top: 4px;
         }
 
@@ -258,7 +258,7 @@
             <div class="tag">LEVEL UP 🎂</div>
             <h1>¡Se acerca mi <span class="highlight">Cumpleaños!</span></h1>
             
-            <!-- CONTADOR REGRESIVO -->
+            <!-- CONTADOR REGRESIVO COMPLETO -->
             <div class="countdown-container">
                 <div class="countdown-box">
                     <span class="countdown-value" id="cd-months">0</span>
@@ -271,6 +271,10 @@
                 <div class="countdown-box">
                     <span class="countdown-value" id="cd-hours">00</span>
                     <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-value" id="cd-minutes">00</span>
+                    <span class="countdown-label">Min</span>
                 </div>
                 <div class="countdown-box">
                     <span class="countdown-value" id="cd-seconds">00</span>
@@ -406,11 +410,11 @@
             }
         }
 
-        // LÓGICA DEL CONTEO REGRESIVO
+        // LÓGICA DEL CONTEO REGRESIVO CON MINUTOS
         function updateCountdown() {
             const now = new Date();
             let year = now.getFullYear();
-            let targetDate = new Date(year, 8, 30, 0, 0, 0); // 30 de Septiembre (Mes 8 en JS)
+            let targetDate = new Date(year, 8, 30, 0, 0, 0); // 30 de Septiembre
 
             if (now > targetDate) {
                 targetDate = new Date(year + 1, 8, 30, 0, 0, 0);
@@ -426,16 +430,16 @@
                 tempDate.setMonth(tempDate.getMonth() + diffMonths);
             }
 
-            const diffMs = targetDate - tempDate;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
             const totalMsLeft = targetDate - now;
+            const diffDays = Math.floor((targetDate - tempDate) / (1000 * 60 * 60 * 24));
             const diffHours = Math.floor((totalMsLeft / (1000 * 60 * 60)) % 24);
+            const diffMinutes = Math.floor((totalMsLeft / (1000 * 60)) % 60);
             const diffSeconds = Math.floor((totalMsLeft / 1000) % 60);
 
             document.getElementById('cd-months').innerText = diffMonths;
             document.getElementById('cd-days').innerText = diffDays;
             document.getElementById('cd-hours').innerText = String(diffHours).padStart(2, '0');
+            document.getElementById('cd-minutes').innerText = String(diffMinutes).padStart(2, '0');
             document.getElementById('cd-seconds').innerText = String(diffSeconds).padStart(2, '0');
         }
 
